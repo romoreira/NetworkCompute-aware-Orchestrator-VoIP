@@ -63,7 +63,7 @@ public class Intents extends Thread{
 		
 		while(true){
 			
-			
+			//TO-DO
 		}
 	}
 	
