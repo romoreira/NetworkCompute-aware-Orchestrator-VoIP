@@ -51,19 +51,51 @@ public class Intents extends Thread{
 		OnosControllerAgent oca = new OnosControllerAgent();
 		JSONProcessor jsonProcessor = new JSONProcessor();
 		
-		ArrayList<Intents> intentsListTemp =  jsonProcessor.getIntentList(oca.getIntents());
+		ArrayList<Intents> intentsListTemp =  null;//jsonProcessor.getIntentList(oca.getIntents());
 		ArrayList<Intents> intentsList = new ArrayList<Intents>();
 		
-		if(intentsList.size() == 0){
-			intentsList = intentsListTemp;
-		}
-
-		boolean found = false;
-		int index = -1;
+		int intentsListSize = intentsList.size();
+		int listIndex = 0;
 		
 		while(true){
 			
-			//TO-DO
+			intentsListTemp =  jsonProcessor.getIntentList(oca.getIntents());
+			
+			if(intentsListTemp.size() > intentsList.size()){
+				
+				if(intentsList.size() == 0){
+					for(int i = 0; i < intentsListTemp.size(); i++){
+						intentsListTemp.get(i).setAGE(1440);
+						intentsList.add(intentsListTemp.get(i));
+					}
+				
+				}
+				else{
+				
+					for(int i = 0; i < intentsListTemp.size(); i++){
+						while(listIndex < intentsListSize){
+							if(intentsListTemp.get(i).getID().equals(intentsList.get(listIndex).getId())){
+								break;
+							}
+							else{
+								if(listIndex < intentsListSize){
+									listIndex++;
+								}
+								else{
+									intentsListTemp.get(i).setAGE(1440);
+									intentsList.add(intentsListTemp.get(i));
+								}
+							}
+						}
+						listIndex = 0;
+					}
+				}	
+			}
+			try{Thread.sleep(60000);}catch(Exception e){System.out.println("Erro ao colocar a Thread intentsAnalyzer para dormir");}
+			for(int i =0; i < intentsList.size(); i++){
+				int idadeAnterior= intentsList.get(i).getAGE();
+				intentsList.get(i).setAGE(idadeAnterior - 1); 
+			}
 		}
 	}
 	
