@@ -55,7 +55,7 @@ public class Network extends Fibre{
 	public void networkMonitor(){
 		Intents intents = new Intents();
 		Thread intentsThread = new Thread(intents);
-		//intentsThread.start();
+		intentsThread.start();
 		
 		PackageInspector dpi = new PackageInspector();
 		Thread threadDPI = new Thread(dpi);

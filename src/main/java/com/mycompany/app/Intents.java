@@ -2,6 +2,8 @@ package com.mycompany.app;
 
 import java.util.ArrayList;
 
+import javax.swing.InternalFrameFocusTraversalPolicy;
+
 public class Intents extends Thread{
 	private String TYPE;
 	private String ID;
@@ -47,7 +49,7 @@ public class Intents extends Thread{
 		PAIRS = pAIRS;
 	}
 	
-	public void intentAnalyzer(){
+	public void intentAnalyzer() throws Exception{
 		OnosControllerAgent oca = new OnosControllerAgent();
 		JSONProcessor jsonProcessor = new JSONProcessor();
 		
@@ -61,15 +63,18 @@ public class Intents extends Thread{
 			
 			intentsListTemp =  jsonProcessor.getIntentList(oca.getIntents());
 			
+			
+			//Quando for maior que zero significa que houve atualizacao das Intents - mais chamadas em curso
 			if(intentsListTemp.size() > intentsList.size()){
 				
+				//Se a lista principal for zero entao devo atualizar ele com os novos dados coletados - as intents comecam com idades de 1440 minutos de vida (24hrs)
 				if(intentsList.size() == 0){
 					for(int i = 0; i < intentsListTemp.size(); i++){
 						intentsListTemp.get(i).setAGE(1440);
 						intentsList.add(intentsListTemp.get(i));
 					}
-				
 				}
+				//A lista principal nao e zero, entao devera ser adicionado somente aquele elemento novo e com seu tempo de vida igual a 1440 minutos (24hrs)
 				else{
 				
 					for(int i = 0; i < intentsListTemp.size(); i++){
@@ -91,15 +96,48 @@ public class Intents extends Thread{
 					}
 				}	
 			}
+			else{
+				if(intentsListTemp.size() != 0){
+					int index = 0;
+					for(int i = 0; i < intentsList.size(); i++){
+						while(index < intentsListTemp.size()){
+							if(intentsList.get(i).equals(intentsListTemp.get(index))){
+								index = 0;
+								break;
+							}
+							if(index == intentsListTemp.size()){
+								intentsList.remove(i);
+							}
+							index++;
+						}
+					}
+				}
+				else{
+					try{Thread.sleep(60000);}catch(Exception e){System.out.println("Erro ao colocar a thread IntentsAnalyzer para dormir - caso que a lista de intents diminuiu");}
+				}
+				
+			}
 			try{Thread.sleep(60000);}catch(Exception e){System.out.println("Erro ao colocar a Thread intentsAnalyzer para dormir");}
-			for(int i =0; i < intentsList.size(); i++){
-				int idadeAnterior= intentsList.get(i).getAGE();
-				intentsList.get(i).setAGE(idadeAnterior - 1); 
+			for(int i = 0; i < intentsList.size(); i++){
+				int idadeAnterior = intentsList.get(i).getAGE();
+				idadeAnterior = idadeAnterior - 1;
+				if(idadeAnterior <= 0){
+					oca.removeHostToHostIntent(intentsList.get(i).getPAIRS().get(0), intentsList.get(i).getPAIRS().get(1));
+					intentsList.remove(i);
+				}
+				else{
+					intentsList.get(i).setAGE(idadeAnterior - 1);
+				}
 			}
 		}
 	}
 	
 	public void run(){
-		this.intentAnalyzer();
+		try{
+			this.intentAnalyzer();
+		}
+		catch(Exception e){
+			System.out.println("Verificar algoritimo intentsAnalyzer: "+e.getMessage());
+		}
 	}
 }

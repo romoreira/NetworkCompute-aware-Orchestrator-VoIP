@@ -27,7 +27,7 @@ public class App {
 		//Inicio da Thread para monitoramento dos recursos de Compute;
 		ComputeMonitor compute = new ComputeMonitor();
 		Thread computeThread = new Thread(compute);
-		computeThread.start();
+		//computeThread.start();
 
 		//Inicio da Thread para monitoramento dos recursos de Network;
 		Network network = new Network();
