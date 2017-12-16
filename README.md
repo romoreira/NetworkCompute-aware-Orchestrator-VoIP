@@ -1,2 +1,2 @@
-Repository of the master's work Rodrigo Moreira at UFU.
-The code in the repository contains Orchestrator functionality for compute and network resources in VoIP and Cloud computing contexts.
+Repository of the master's work Rodrigo Moreira at UFU.br.
+The code in the repository contains Orchestrator functionality for compute and network resources managment for Multimedia Aplications in NFV-based scenarios.
